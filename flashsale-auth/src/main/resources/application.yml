@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: flashsale-auth
+  config.import: optional:nacos:${spring.application.name}.yaml?group=${NACOS_CONFIG_GROUP:DEFAULT_GROUP}
+  cloud:
+    nacos:
+      discovery.server-addr: ${NACOS_SERVER_ADDR:nacos:8848}
+      config.server-addr: ${NACOS_SERVER_ADDR:nacos:8848}
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/flashsale}
+    username: ${SPRING_DATASOURCE_USERNAME:flashsale}
+    password: ${SPRING_DATASOURCE_PASSWORD:flashsale}
+  jackson:
+    default-property-inclusion: non_null
+    time-zone: UTC
+server:
+  port: ${SERVER_PORT:8080}
+management:
+  endpoints.web.exposure.include: health,info,prometheus
+flashsale:
+  security:
+    jwt-secret: ${JWT_SECRET}
+    jwt-ttl: ${JWT_TTL:PT2H}
+  bootstrap:
+    admin:
+      username: ${ADMIN_USERNAME:}
+      password: ${ADMIN_PASSWORD:}

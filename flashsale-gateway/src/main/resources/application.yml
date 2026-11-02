@@ -1,0 +1,30 @@
+spring:
+  application.name: flashsale-gateway
+  config:
+    import: optional:nacos:${spring.application.name}.yaml?group=${NACOS_CONFIG_GROUP:DEFAULT_GROUP}
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER_ADDR:nacos:8848}
+        group: ${NACOS_DISCOVERY_GROUP:DEFAULT_GROUP}
+        namespace: ${NACOS_NAMESPACE:}
+      config:
+        server-addr: ${NACOS_SERVER_ADDR:nacos:8848}
+        group: ${NACOS_CONFIG_GROUP:DEFAULT_GROUP}
+        namespace: ${NACOS_NAMESPACE:}
+server.port: ${SERVER_PORT:8080}
+management.endpoints.web.exposure.include: health,info,prometheus
+flashsale.security.jwt-secret: ${JWT_SECRET}
+flashsale.security.jwt-ttl: ${JWT_TTL:PT2H}
+flashsale.gateway:
+  auth-url: ${AUTH_SERVICE_URL:http://auth:8080}
+  product-url: ${PRODUCT_SERVICE_URL:http://product:8080}
+  activity-url: ${ACTIVITY_SERVICE_URL:http://activity:8080}
+  coupon-url: ${COUPON_SERVICE_URL:http://coupon:8080}
+  order-url: ${ORDER_SERVICE_URL:http://order:8080}
+  payment-url: ${PAYMENT_SERVICE_URL:http://payment:8080}
+  rate-limit:
+    default-qps: ${GATEWAY_DEFAULT_QPS:100}
+    ip-qps: ${GATEWAY_IP_QPS:100}
+    activity-hotspot-qps: ${GATEWAY_ACTIVITY_HOTSPOT_QPS:20}
+    coupon-hotspot-qps: ${GATEWAY_COUPON_HOTSPOT_QPS:20}
