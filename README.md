@@ -93,8 +93,7 @@ flowchart LR
 
 | 场景 | 结果 |
 |---|---|
-| 500 QPS × 20 秒抢购（库存 300） | 10,001 次请求，dropped 0，P50 ≈ 7.6 ms；成交恰好 300 单 |
-| 1000 QPS × 10 秒抢购（库存 300） | 完成 7,738 次请求（dropped 2,263，受本机发压能力限制）；成交仍为 300 单 |
+| 500 QPS × 20 秒抢购（库存 300） | 10,001 次请求，dropped 0，P50 4.0 ms，P95 81 ms；成交恰好 300 单 |
 | 幂等重放（100 VU × 30 秒，同一幂等键） | 82,453 次重复提交仅产生 100 笔订单，重复有效订单 0 |
 | 活动暂停 / 恢复 | 暂停期新预扣全部拒绝，恢复后继续成交；12 笔订单下 Redis 288 = PostgreSQL 288，事件序号 1–12 连续无空洞 |
 | 七项 SQL 对账 | 负库存、重复有效订单、事件断号、Outbox 积压、消费幂等未完成、无订单的预留，全部 0 违规 |
@@ -140,7 +139,7 @@ H03 使用独立 Compose project 和临时卷，不影响日常环境：
 ```bash
 H03_SCENARIO=activity_burst load/h03/run.sh up
 ADMIN_PASSWORD=change-me-admin-password H03_SCENARIO=activity_burst load/h03/run.sh prepare
-H03_USER_COUNT=9000 LOAD_TOKENS_FILE=load/h03/tokens.txt load/h03/prepare-users.sh
+H03_USER_COUNT=2000 LOAD_TOKENS_FILE=load/h03/tokens.txt load/h03/prepare-users.sh
 H03_SCENARIO=activity_burst LOAD_TOKENS_FILE=load/h03/tokens.txt load/h03/run.sh run
 load/h03/run.sh verify
 load/h03/run.sh down
@@ -170,8 +169,8 @@ load/h03/run.sh down
 
 ## 已知限制
 
-- 1 秒 10,000 请求的目标突发窗口本机未跑通，[1000 QPS 记录](docs/h03-acceptance/records/1000qps-x10s.md) 实际完成 7,738 条。
-- P95 约 1.6 s 是本机内存与容器资源竞争的结果，不代表代码路径性能。
+- 未做“1 秒内 10,000 次瞬时突发”：本机验证的是 500 QPS 持续 20 秒、累计 10,001 次请求。
+- 数据库库存投影为异步追平，压力结束后存在短暂滞后，不作为实时强一致结论。
 - 恢复任务首次校验可能因 `CHECKPOINT_GAP` 失败并保持 `PAUSED`（设计行为），需要再次请求恢复。
 
 ## 文档

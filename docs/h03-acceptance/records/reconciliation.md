@@ -1,6 +1,12 @@
 # H03 最终对账记录
 
-执行工件：[`load/h03/verify.sql`](../../../load/h03/verify.sql)
+执行时间：2026-11-02，在 500 QPS × 20 秒场景结束、活动售罄后执行。
+
+执行方式：
+
+```text
+psql -U flashsale -d flashsale -f load/h03/verify.sql
+```
 
 ## PostgreSQL 对账结果
 
@@ -14,11 +20,13 @@
 | `consumer_not_succeeded` | 0 |
 | `reservation_without_order` | 0 |
 
-## Outbox 与幂等
+## 说明
 
-- 六个业务服务均注册 `outboxDispatch` executor。
-- H03 临时 XXL-Job MySQL 已幂等创建每秒调度任务。
-- Admin 与 executor 使用统一 `default_token`。
-- 历史 `PENDING` Outbox 已追平为 `SENT`。
-- 重复下单和冲突幂等结果符合设计。
-- 优惠券单用户限领只生成一张用户券，Coupon Outbox 为 `SENT`。
+- 六个业务服务均注册 `outboxDispatch` executor，H03 临时 XXL-Job MySQL 幂等创建调度任务。
+- 对账检查的是约束与不变量（负库存、重复有效订单、事件断号、Outbox 积压、消费失败、孤立预留），
+  不检查库存投影的追平进度。
+- 数据库库存投影为异步追平，对账时允许存在短暂滞后；滞后不影响上述 7 项结果。
+
+## 执行工件
+
+- [`load/h03/verify.sql`](../../../load/h03/verify.sql)
