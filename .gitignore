@@ -7,8 +7,6 @@
 !.env.example
 docker-compose.override.yml
 .screenshots/
-.codex/
-.codebase-memory/
 load/h03/data.json
 load/h03/tokens*
 load/h03/results/
