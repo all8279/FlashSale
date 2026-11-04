@@ -165,7 +165,7 @@ load/h03/run.sh down
 | SkyWalking 业务 Span 不上报，UI 只见健康检查 | OAP collector 端口由 `11800` 改为 `12800` |
 | H03 环境 `resume` 永久 `PENDING` | 初始化脚本补充 `activityRecovery` 调度任务 |
 | 恢复成功后 Redis 门闸仍为 `CLOSED`，恢复后无法下单 | 恢复投影脚本在不覆盖库存的前提下重开 `gate=RESERVE` |
-| 压测脚本导不出 P99 | 未处理，当前简历与文档只使用 P50 / P95 |
+| 压测脚本导不出 P99 | 未处理，当前文档只使用 P50 / P95 |
 
 ## 已知限制
 
